@@ -7,7 +7,6 @@ import numpy as np
 from spml.data.datasets.base_dataset import ListDataset
 import spml.data.transforms as transforms
 
-
 class ListTagDataset(ListDataset):
   """Class of dataset which takes a file of paired list of 
   images and labels. This class returns image-level tags
@@ -121,7 +120,8 @@ class ListTagDataset(ListDataset):
     labels = {'semantic_label': semantic_label,
               'instance_label': instance_label,
               'semantic_tag': semantic_tag}
-
+    '''print('in ListTagDataset.__getitem__, semantic_label dtype/device: {}/{}, instance_label dtype/device: {}/{}'.format(
+        labels['semantic_label'].dtype, 'cpu', labels['instance_label'].dtype, 'cpu'))'''
     return inputs, labels, idx
 
 

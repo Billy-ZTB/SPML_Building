@@ -49,11 +49,13 @@ def _calculate_log_likelihood(embeddings,
   similarities = (torch.mm(embeddings, prototypes.t())
                        .mul_(concentration)
                        .exp_())
+  num_pixels, num_prototypes = similarities.shape
 
   # Extract pixel to self prototype similarities.
   instance_labels = instance_labels.view(-1, 1)
   semantic_labels = semantic_labels.view(-1, 1)
   prototype_semantic_labels = prototype_semantic_labels.view(1, -1)
+
 
   pixel_to_prototype_similarities = torch.gather(
       similarities, 1, instance_labels)

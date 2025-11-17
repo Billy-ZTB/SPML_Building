@@ -212,9 +212,7 @@ def prepare_prototype_labels(semantic_labels,
   panoptic_labels = semantic_labels + instance_labels * offset
   prototype_panoptic_labels, unique_instance_labels = torch.unique(
       panoptic_labels, return_inverse=True)
-
   prototype_semantic_labels = prototype_panoptic_labels % offset
-
   return prototype_semantic_labels, unique_instance_labels
 
 

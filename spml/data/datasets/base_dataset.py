@@ -139,7 +139,6 @@ class ListDataset(torch.utils.data.Dataset):
     image, semantic_label, instance_label = self._get_datas_by_index(idx)
 
     label = np.stack([semantic_label, instance_label], axis=2)
-
     if self.random_mirror:
       image, label = transforms.random_mirror(image, label)
 
@@ -186,10 +185,10 @@ class ListDataset(torch.utils.data.Dataset):
     inputs = {'image': image.transpose(2, 0, 1)}
     labels = {'semantic_label': semantic_label,
               'instance_label': instance_label}
-
+    
     return inputs, labels, idx
 
-  def _collate_fn_dict_list(self, dict_list):
+  '''def _collate_fn_dict_list(self, dict_list):
     """Helper function to collate a list of dictionaries.
     """
     outputs = {}
@@ -209,8 +208,66 @@ class ListDataset(torch.utils.data.Dataset):
 
       outputs[key] = values
 
-    return outputs
+    return outputs'''
+  
+  def _collate_fn_dict_list(self, dict_list):
+    """Helper function to collate a list of dictionaries.
 
+    Faster and safer than creating a tensor from a Python list of ndarrays.
+    We try to np.stack the numpy arrays (fast); if that fails (e.g. varying
+    shapes), we fall back to the original behavior.
+    """
+    outputs = {}
+    for key in dict_list[0].keys():
+      values = [d[key] for d in dict_list]
+
+      # preserve None
+      if values[0] is None:
+        outputs[key] = None
+        continue
+
+      # If items are numpy arrays with consistent shapes -> stack then from_numpy
+      if isinstance(values[0], np.ndarray):
+        try:
+          arr = np.stack(values, axis=0)   # shape (N, ...)
+        except Exception:
+          # fallback: shapes may differ; use original (slower) construction
+          if (values[0].dtype == np.uint8
+               or values[0].dtype == np.int32
+               or values[0].dtype == np.int64):
+            outputs[key] = torch.LongTensor(values)
+          elif (values[0].dtype == np.float32
+                 or values[0].dtype == np.float64):
+            outputs[key] = torch.FloatTensor(values)
+          else:
+            raise ValueError('Unsupported data type')
+          continue
+
+        # Normal fast path: convert stacked ndarray to tensor with appropriate dtype
+        if np.issubdtype(arr.dtype, np.integer):
+          # ensure int64 for LongTensor semantics
+          arr = arr.astype(np.int64)
+          outputs[key] = torch.from_numpy(arr)
+        else:
+          # float path: cast to float32 for compactness / GPU compatibility
+          arr = arr.astype(np.float32)
+          outputs[key] = torch.from_numpy(arr)
+
+      else:
+        # Values are not numpy arrays (scalars or already tensors)
+        v0 = values[0]
+        if isinstance(v0, torch.Tensor):
+          outputs[key] = torch.stack(values, dim=0)
+        elif isinstance(v0, (int, np.integer)):
+          outputs[key] = torch.LongTensor(values)
+        elif isinstance(v0, (float, np.floating)):
+          outputs[key] = torch.FloatTensor(values)
+        else:
+          # last resort: let torch try to convert the list
+          outputs[key] = torch.as_tensor(values)
+
+    return outputs
+  
   def collate_fn(self, batch):
     """Customized collate function to group datas into batch.
     """

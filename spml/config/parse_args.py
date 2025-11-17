@@ -24,6 +24,8 @@ def parse_args(description=''):
                       help='/root/dir/to/data.')
   parser.add_argument('--data_list', type=str, default=None,
                       help='/path/to/data/list.')
+  parser.add_argument('--val_list', type=str, default=None,
+                      help='/path/to/val/data/list.')
   # Network parameters.
   parser.add_argument('--kmeans_num_clusters', type=str,
                       help='H,W')

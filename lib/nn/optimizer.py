@@ -12,6 +12,7 @@
 # ---------------------------------------------------------------------------
 
 import math
+from scipy.stats.distributions import alpha
 import torch
 from torch.optim.optimizer import Optimizer, required
 
@@ -84,7 +85,7 @@ class SGD(Optimizer):
           continue
         d_p = p.grad.data
         if weight_decay != 0:
-          d_p.add_(weight_decay, p.data)
+          d_p.add_(p.data, alpha=weight_decay)
         if momentum != 0:
           param_state = self.state[p]
           if 'momentum_buffer' not in param_state:

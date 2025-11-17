@@ -73,7 +73,6 @@ TRAIN_DATA_LIST=datasets/voc12/scribble_${TRAIN_SPLIT}_d3_hed.txt
 TEST_DATA_LIST=datasets/voc12/panoptic_${INFERENCE_SPLIT}.txt
 MEMORY_DATA_LIST=datasets/voc12/panoptic_${TRAIN_SPLIT}_hed.txt
 
-
 # Build configuration file for training embedding network.
 if [ ${IS_CONFIG_EMB} -eq 1 ]; then
   if [ ! -d ${SNAPSHOT_DIR} ]; then

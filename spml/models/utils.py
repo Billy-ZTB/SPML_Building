@@ -125,7 +125,6 @@ def gather_clustering_and_update_prototypes(embeddings,
   prototype_semantic_labels = [prototype_semantic_labels.to(d) for d in devices]
   prototype_instance_labels = [prototype_instance_labels.to(d) for d in devices]
   prototype_batch_indices = [prototype_batch_indices.to(d) for d in devices]
-
   return prototypes, prototypes_with_loc,\
          prototype_semantic_labels, prototype_instance_labels,\
          prototype_batch_indices, updated_cluster_indices

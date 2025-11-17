@@ -137,7 +137,7 @@ class SegsortSoftmax(nn.Module):
       embeddings = datas['cluster_embedding']
       semantic_labels = datas['cluster_semantic_label']
       batch_indices = datas['cluster_batch_index']
-
+      
       prototypes = targets['prototype']
       prototype_semantic_labels = targets['prototype_semantic_label']
       prototype_batch_indices = targets['prototype_batch_index']
@@ -193,6 +193,8 @@ class SegsortSoftmax(nn.Module):
       new_cluster_indices = torch.gather(
           c_inds, 0, cluster_indices)
 
+      '''print('index max:', pixel_inds.max().item(), 'index min:', pixel_inds.min().item())
+      print('emb shape:', embeddings.shape, 'sem lab shape:', semantic_labels.shape)'''
       sem_ann_loss += self.sem_ann_loss (
           torch.index_select(embeddings, 0, pixel_inds),
           torch.index_select(semantic_labels, 0, pixel_inds),

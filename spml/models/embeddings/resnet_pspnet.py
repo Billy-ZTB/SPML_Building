@@ -74,6 +74,7 @@ class ResnetPspnet(ResnetBase):
     # Generate embeddings.
     _, _, _, res5 = self.resnet_backbone(datas['image'])
 
+    # embeddings: decoder输出
     embeddings = self.pspp(res5)
     embeddings = F.interpolate(embeddings, scale_factor=2, mode='bilinear')
 
@@ -154,7 +155,7 @@ class ResnetPspnet(ResnetBase):
 
     targets = targets if targets is not None else {}
 
-    # Generaet embeddings.
+    # Generate embeddings.
     outputs = self.generate_embeddings(datas, targets, resize_as_input)
 
     # Resize labels to embedding size.
